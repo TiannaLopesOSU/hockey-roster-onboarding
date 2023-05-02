@@ -6,6 +6,10 @@
               <div class="m-2">
                 <h1>Portland WinterHawks</h1>
             </div>
+            <div class="alert alert-danger" role="alert" v-if="fullPlayerList.length < 10">
+ The roster is not complete! Add at least 10 players. 
+</div>
+
           <!-- Sorting and Filter Options -->
           <button type="button" class="btn btn-secondary m-2" v-on:click="sort('asc')">Sort By Jersey Number Ascending</button>
           <button type="button" class="btn btn-secondary m-2" v-on:click="sort('desc')">Sort By Jersey Number Descending</button>
@@ -347,9 +351,17 @@ this.calculatePointsPerGame();
     if(newPlayer.playerName === '' || newPlayer.jerseyNumber === '' || newPlayer.position === '' || newPlayer.gamesPlayed === '' || newPlayer.goals === '' || newPlayer.assists === '' || newPlayer.points === ''
      || newPlayer.penaltyMinutes === '' || newPlayer.shotsOnGoal === '' || newPlayer.gameWinningGoals === ''){
       return false;
+     }else if(this.numberExists(newPlayer.jerseyNumber)){ 
+      alert('That jersey number is already in use. Please change it and try again.');
+      return false;
      }else{
     return true;
      }
+  },
+  numberExists(number){
+    return this.playerList.some((player) => {
+      return player.jerseyNumber === number;
+    });
   }
 }
   }
