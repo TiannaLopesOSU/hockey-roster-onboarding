@@ -26,7 +26,7 @@
           <table class="table table-striped m-2">
               <thead>
                 <tr>
-                  <th scope="col">#</th>
+                  <th scope="col">Jersey #</th>
                   <th scope="col">Player Name</th>
                   <th scope="col">Position</th>
                   <th scope="col">Goals</th>
@@ -50,16 +50,97 @@
                     <td>{{item.penaltyMinutes}}</td>
                     <td>{{item.shotsOnGoal}}</td>
                     <td>{{item.pointsPerGame}}</td>
+                    <td>  <button type="button" class="btn btn-danger m-2" v-on:click="deletePlayer(item)">Remove</button></td>
                 </tr>
               </tbody>
             </table>
       </div>
     </div>
+
+
+    <!-- Add Player Form  -->
+<div>
+  <div class="m-2">
+                <h3>Add a new player to the roster</h3>
+   </div>
+  <form class="m-2">
+
+  <div class="form-group review-form" @submit.prevent="onSubmit">
+    <label for="playerName">New Player Name</label>
+    <input type="name" class="form-control" id="playerName" placeholder="Jimmy Jones" v-model="playerName" :class="{ 'invalid': (playerName === '' && submitted === true) }">
+    <div class="error-message" v-if="(playerName === '' && submitted === true)"> Player Name is required.</div>
+
+  </div>
+
+  <div class="form-group">
+    <label for="jerseyNumber">Jersey Number</label>
+    <input type="number" class="form-control" id="jerseyNumber" placeholder="22" v-model="jerseyNumber" :class="{ 'invalid': (jerseyNumber === '' && submitted === true) }">
+    <div class="error-message" v-if="(jerseyNumber === '' && submitted === true)"> Jersey Number is required.</div>
+
+  </div>
+
+  <div class="form-group">
+    <label for="position">Position</label>
+    <select class="form-control" id="position" v-model="position">
+      <option>Forward</option>
+      <option>Defense</option>
+      <option>Goalie</option>
+    </select>
+  </div>
+
+  <div class="form-group">
+    <label for="gamesPlayed">Games Played</label>
+    <input type="number" class="form-control" id="gamesPlayed" placeholder="65" v-model="gamesPlayed" :class="{ 'invalid': (gamesPlayed === '' && submitted === true) }">
+    <div class="error-message" v-if="(gamesPlayed === '' && submitted === true)"> Games Played is required.</div>
+
+  </div>
+
+  <div class="form-group">
+    <label for="goals">Goals</label>
+    <input type="number" class="form-control" id="goals" placeholder="23" v-model="goals" :class="{ 'invalid': (goals === '' && submitted === true) }">
+    <div class="error-message" v-if="(goals === '' && submitted === true)"> Goals are required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="assists">Assists</label>
+    <input type="number" class="form-control" id="assists" placeholder="63" v-model="assists" :class="{ 'invalid': (assists === '' && submitted === true) }" >
+<div class="error-message" v-if="(assists === '' && submitted === true)"> Assists are required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="points">Points</label>
+    <input type="number" class="form-control" id="points" placeholder="86" v-model="points" :class="{ 'invalid': (points === '' && submitted === true) }">
+    <div class="error-message" v-if="(points === '' && submitted === true)"> Points are required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="penaltyMinutes">Penalty Minutes</label>
+    <input type="number" class="form-control" id="penaltyMinutes" placeholder="98" v-model="penaltyMinutes" :class="{ 'invalid': (penaltyMinutes === '' && submitted === true) }">
+    <div class="error-message" v-if="(penaltyMinutes === '' && submitted === true)"> Penalty Minutes are required.</div>
+  </div>
+
+  <div class="form-group">
+    <label for="shotsOnGoal">Shots On Goal</label>
+    <input type="number" class="form-control" id="shotsOnGoal" placeholder="312" v-model="shotsOnGoal" :class="{ 'invalid': (shotsOnGoal === '' && submitted === true) }">
+    <div class="error-message" v-if="(shotsOnGoal === '' && submitted === true)"> Shots on goal are required.</div>
+  </div>
+
+
+  <button type="button" class="btn btn-secondary m-2" v-on:click="onSubmit()">Add New Player</button>
+</form>
+</div>
+
+
   </body>
 </template>
 
 <style scoped>
-
+.invalid{
+  border: 1px solid red;
+}
+.error-message{
+  color: red;
+}
 </style>
 
 <script >
@@ -67,6 +148,17 @@ import axios from 'axios';
   export default  {
     data() {
     return {
+      submitted: false,
+      playerName: '',
+      jerseyNumber: '',
+      position: 'Forward',
+      gamesPlayed: '',
+      goals: '',
+      assists: '',
+      points: '',
+      penaltyMinutes: '',
+      shotsOnGoal: '',
+      pointsPerGame: '',
       fullPlayerList: [],
       playerList: [
   {
@@ -199,8 +291,8 @@ import axios from 'axios';
           this.fullPlayerList = [...this.playerList];
         },
     calculatePointsPerGame() {
-this.playerList.forEach((player) => {
-  player.pointsPerGame = ((player.goals + player.assists) / player.gamesPlayed).toFixed(2);
+  this.playerList.forEach((player) => {
+  player.pointsPerGame = ((player.points) / player.gamesPlayed).toFixed(2);
 })
     },
 
@@ -218,7 +310,47 @@ this.playerList.forEach((player) => {
     this.playerList = this.fullPlayerList.filter((item) => {
      return item.position === position;
       });
-    }
+    },
+  onSubmit(){
+    this.submitted = true;
+  let newPlayer = {
+  playerName: this.playerName,
+  jerseyNumber: this.jerseyNumber,
+  position: this.position,
+  gamesPlayed: this.gamesPlayed,
+  goals: this.goals,
+  assists: this.assists,
+  points: this.points,
+  penaltyMinutes: this.penaltyMinutes,
+  shotsOnGoal: this.shotsOnGoal,
+}
+if(this.formIsValid(newPlayer)){
+this.fullPlayerList.push(newPlayer);
+this.playerList.push(newPlayer);
+this.calculatePointsPerGame();
+
+}else{
+  console.log('Form is not valid');
+}
+  },
+  deletePlayer(player){
+   this.fullPlayerList = this.fullPlayerList.filter((item) => {
+    return item.jerseyNumber!== player.jerseyNumber;
+   });
+   this.playerList = this.fullPlayerList.filter((item) => {
+    return item.jerseyNumber!== player.jerseyNumber;
+   });
+  },
+
+  formIsValid(newPlayer){
+    console.log(newPlayer);
+    if(newPlayer.playerName === '' || newPlayer.jerseyNumber === '' || newPlayer.position === '' || newPlayer.gamesPlayed === '' || newPlayer.goals === '' || newPlayer.assists === '' || newPlayer.points === ''
+     || newPlayer.penaltyMinutes === '' || newPlayer.shotsOnGoal === '' || newPlayer.gameWinningGoals === ''){
+      return false;
+     }else{
+    return true;
+     }
   }
+}
   }
 </script>
