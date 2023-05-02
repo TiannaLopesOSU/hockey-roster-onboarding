@@ -41,7 +41,12 @@ const createTableRow = (rowData) => {
 
   columns.forEach((column) => {
     const cell = document.createElement("td");
-    cell.textContent = rowData[column];
+    // calculate points per game
+    if (column === "pointsPerGame") {
+      cell.textContent = (rowData.points / rowData.gamesPlayed).toFixed(2);
+    } else {
+      cell.textContent = rowData[column];
+    }
     tableRow.appendChild(cell);
   });
   return tableRow;
