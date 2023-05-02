@@ -22,17 +22,17 @@
     </div>
 
       <!-- Sorting and Filter Options -->
-        <button type="button" class="btn btn-secondary m-2" >Sort By Jersey Number Ascending</button>
-        <button type="button" class="btn btn-secondary m-2" >Sort By Jersey Number Descending</button>
+        <button type="button" class="btn btn-secondary m-2" onclick="sort('asc')">Sort By Jersey Number Ascending</button>
+        <button type="button" class="btn btn-secondary m-2"onclick="sort('desc')" >Sort By Jersey Number Descending</button>
 
         <div class="dropdown m-2">
             <button class="btn btn-secondary dropdown-toggle" type="button" id="dropdownMenuButton" data-toggle="dropdown" aria-expanded="false">
              Filter By Position
             </button>
             <div class="dropdown-menu" aria-labelledby="dropdownMenuButton">
-              <a class="dropdown-item" href="#" >Forward</a>
-              <a class="dropdown-item" href="#" >Defense</a>
-              <a class="dropdown-item" href="#" >Goalie</a>
+              <a class="dropdown-item" href="#" onclick="filter('Forward')" >Forward</a>
+              <a class="dropdown-item" href="#" onclick="filter('Defense')">Defense</a>
+              <a class="dropdown-item" href="#" onclick="filter('Goalie')" >Goalie</a>
             </div>
           </div>
 
@@ -44,11 +44,14 @@
                 <th scope="col">#</th>
                 <th scope="col">Player Name</th>
                 <th scope="col">Position</th>
+                <th scope="col">Games Played</th>
                 <th scope="col">Goals</th>
                 <th scope="col">Assists</th>
                 <th scope="col">Points</th>
-                <th scope="col">Games Played</th>
+                <th scope="col">Penalty Minutes</th>
+                <th scope="col">Shots On Goal</th>
                 <th scope="col">Points Per Game</th>
+                <th scope="col">Game Winning Goals</th>
               </tr>
             </thead>
             <tbody id="table">
