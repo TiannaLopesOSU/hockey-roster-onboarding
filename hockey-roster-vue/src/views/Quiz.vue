@@ -1,4 +1,5 @@
 <template>
+  <!-- Questions -->
   <h6
     class="mt-2 text-center"
     v-if="
@@ -10,6 +11,8 @@
   >
     {{ questions[currentQuestion].question }}
   </h6>
+
+  <!-- Next Button -->
   <div
     class="text-center"
     v-if="
@@ -28,8 +31,12 @@
       Next Question
     </button>
   </div>
-  <label class="m-2"> Show Positions: </label>
-  <input type="checkbox" v-on:click="toggleLabels" data-toggle="toggle" />
+
+  <!-- Show Positions Toggle -->
+  <!-- <label class="m-2"> Show Positions: </label>
+  <input type="checkbox" v-on:click="toggleLabels" data-toggle="toggle" /> -->
+
+  <!-- Ice Rink Component  -->
   <div v-if="questions && currentQuestion < questions.length">
     <IceRinkWithPositions
       @clickedPosition="handleResponse"
@@ -37,6 +44,7 @@
     />
   </div>
 
+  <!-- Quiz is complete  -->
   <div v-else="quizIsComplete === true">The Quiz is complete!</div>
 </template>
 
@@ -50,10 +58,8 @@ export default {
   },
   data() {
     return {
-      clicked: null,
       currentQuestion: 0,
       disableNextButton: true,
-      tryAgainText: false,
       quizIsComplete: false,
       previouslyAnsweredCorrectly: [],
       questions: this.getQuestions(),
@@ -67,9 +73,6 @@ export default {
       ],
     };
   },
-  onMounted() {
-    this.getPositions();
-  },
   methods: {
     toggleLabels() {
       this.positions.forEach((position) => {
@@ -77,44 +80,42 @@ export default {
       });
     },
     handleResponse(response) {
-      if (this.currentQuestion < this.questions.length) {
-        if (
-          response &&
-          response === this.questions[this.currentQuestion].answer
-        ) {
-          this.disableNextButton = false;
-          this.positions.forEach((position) => {
-            if (response === position.position) {
-              position.showText = true;
-              position.color = "green";
-            }
-          });
-          this.previouslyAnsweredCorrectly.push(response.position);
-          this.submitted = false;
-        } else {
-          this.positions.forEach((position) => {
-            if (response === position.position) {
-              position.color = "red";
-            }
-          });
-        }
+      if (
+        response &&
+        response === this.questions[this.currentQuestion].answer
+      ) {
+        this.disableNextButton = false;
+        this.positions.forEach((position) => {
+          if (response === position.position) {
+            position.showText = true;
+            position.color = "green";
+          }
+        });
       } else {
-        this.quizIsComplete = true;
+        this.positions.forEach((position) => {
+          if (response === position.position) {
+            position.color = "red";
+          }
+        });
       }
     },
     nextQuestion() {
-      this.currentQuestion++;
-      this.disableNextButton = true;
-      this.positions.forEach((position) => {
-        if (
-          position.color &&
-          (position.color === "green" || position.color === "grey")
-        ) {
-          position.color = "grey";
-        } else {
-          position.color = null;
-        }
-      });
+      if (this.currentQuestion < this.questions.length) {
+        this.currentQuestion++;
+        this.disableNextButton = true;
+        this.positions.forEach((position) => {
+          if (
+            position.color &&
+            (position.color === "green" || position.color === "grey")
+          ) {
+            position.color = "grey";
+          } else {
+            position.color = null;
+          }
+        });
+      } else {
+        this.quizIsComplete = true;
+      }
     },
     getQuestions() {
       const randomArray = [];
