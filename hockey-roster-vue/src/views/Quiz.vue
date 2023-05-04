@@ -1,22 +1,43 @@
 <template>
-  <!-- Questions -->
-  <h6 class="mt-2 text-center" v-if="currentQuestion < questions.length">
+  <h6
+    class="mt-2 text-center"
+    v-if="
+      questions &&
+      currentQuestion < questions.length &&
+      questions[currentQuestion] &&
+      questions[currentQuestion].question
+    "
+  >
     {{ questions[currentQuestion].question }}
   </h6>
-  <p
-    v-if="tryAgainText === true && submitted === true"
-    class="invalid text-center"
+  <div
+    class="text-center"
+    v-if="
+      questions &&
+      currentQuestion < questions.length &&
+      questions[currentQuestion] &&
+      questions[currentQuestion].question
+    "
   >
-    Incorrect, Try Again!
-  </p>
-
-  <!-- Ice Rink SVG -->
-  <div v-if="currentQuestion < questions.length">
-    <IceRinkWithPositions @clickedPosition="handleResponse" />
-    <div>{{ clicked }}</div>
+    <button
+      type="button"
+      class="btn btn-secondary"
+      v-on:click="nextQuestion"
+      :disabled="disableNextButton"
+    >
+      Next Question
+    </button>
+  </div>
+  <label class="m-2"> Show Positions: </label>
+  <input type="checkbox" v-on:click="toggleLabels" data-toggle="toggle" />
+  <div v-if="questions && currentQuestion < questions.length">
+    <IceRinkWithPositions
+      @clickedPosition="handleResponse"
+      :positions="positions"
+    />
   </div>
 
-  <div v-else>The Quiz is complete!</div>
+  <div v-else="quizIsComplete === true">The Quiz is complete!</div>
 </template>
 
 <script>
@@ -30,41 +51,70 @@ export default {
   data() {
     return {
       clicked: null,
-      // currentQuestion: Math.floor(Math.random()* 6),
       currentQuestion: 0,
-      submitted: false,
+      disableNextButton: true,
       tryAgainText: false,
-      submitted: false,
+      quizIsComplete: false,
+      previouslyAnsweredCorrectly: [],
       questions: this.getQuestions(),
+      positions: [
+        { position: "goalie", showText: false, color: null },
+        { position: "leftDefense", showText: false, color: null },
+        { position: "rightDefense", showText: false, color: null },
+        { position: "rightWing", showText: false, color: null },
+        { position: "center", showText: false, color: null },
+        { position: "leftWing", showText: false, color: null },
+      ],
     };
   },
-  mounted() {
-    // this.getQuestions();
+  onMounted() {
+    this.getPositions();
   },
   methods: {
-    // Hide and show Label of positions
-    // change colors of position circles
-    // all previously selected positions are grey
-    // toggle on and off position texts
-
+    toggleLabels() {
+      this.positions.forEach((position) => {
+        position.showText = !position.showText;
+      });
+    },
     handleResponse(response) {
-      this.submitted = true;
-      if (
-        response &&
-        response === this.questions[this.currentQuestion].answer
-      ) {
-        // Show label for position here
-        alert("Correct!");
-        if (this.currentQuestion < this.questions.length) {
-          this.currentQuestion++;
+      if (this.currentQuestion < this.questions.length) {
+        if (
+          response &&
+          response === this.questions[this.currentQuestion].answer
+        ) {
+          this.disableNextButton = false;
+          this.positions.forEach((position) => {
+            if (response === position.position) {
+              position.showText = true;
+              position.color = "green";
+            }
+          });
+          this.previouslyAnsweredCorrectly.push(response.position);
           this.submitted = false;
-          this.tryAgainText = false;
         } else {
-          alert("You finished the quiz!");
+          this.positions.forEach((position) => {
+            if (response === position.position) {
+              position.color = "red";
+            }
+          });
         }
       } else {
-        this.tryAgainText = true;
+        this.quizIsComplete = true;
       }
+    },
+    nextQuestion() {
+      this.currentQuestion++;
+      this.disableNextButton = true;
+      this.positions.forEach((position) => {
+        if (
+          position.color &&
+          (position.color === "green" || position.color === "grey")
+        ) {
+          position.color = "grey";
+        } else {
+          position.color = null;
+        }
+      });
     },
     getQuestions() {
       const randomArray = [];
@@ -86,12 +136,12 @@ export default {
         },
         {
           question: "Where is the Center?",
-          id: 3,
+          id: 4,
           answer: "center",
         },
         {
           question: "Where is the Right Wing?",
-          id: 4,
+          id: 3,
           answer: "rightWing",
         },
         {
@@ -103,14 +153,13 @@ export default {
 
       let randomIndexArray = [];
       while (randomIndexArray.length < 6) {
-        let r = Math.floor(Math.random() * 6) + 1;
+        let r = Math.floor(Math.random() * 6);
         if (randomIndexArray.indexOf(r) === -1) randomIndexArray.push(r);
       }
 
       randomIndexArray.forEach((index) => {
         randomArray.push(questions[index]);
       });
-      this.questions = randomArray;
       return randomArray;
     },
   },
